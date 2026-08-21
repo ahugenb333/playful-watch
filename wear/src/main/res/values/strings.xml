@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Playful Watch</string>
+    <string name="gallery_title">Face Gallery</string>
+    <string name="face_collection">Playful Collection</string>
+    <string name="face_hourglass">Hourglass</string>
+    <string name="face_liquid_vials">Liquid Vials</string>
+</resources>
