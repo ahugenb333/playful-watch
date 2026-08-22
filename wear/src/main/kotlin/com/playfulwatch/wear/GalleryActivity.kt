@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import com.playfulwatch.watchfaces.PlayfulFaceGallery
 import com.playfulwatch.watchfaces.PlayfulWatchFaces
+import org.splitties.compose.oclock.OClockRootCanvas
 
 class GalleryActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,5 +19,7 @@ class GalleryActivity : ComponentActivity() {
 
 @Composable
 private fun WearGallery() {
-    PlayfulFaceGallery(faces = PlayfulWatchFaces.all)
+    OClockRootCanvas {
+        PlayfulFaceGallery(faces = PlayfulWatchFaces.all)
+    }
 }
