@@ -1,0 +1,5 @@
+# Copy to local.properties (gitignored). Android Studio usually creates sdk.dir for you.
+sdk.dir=/path/to/Android/Sdk
+
+# Optional: only if compose-oclock is not at ../compose-oclock
+# compose.oclock.dir=/path/to/compose-oclock

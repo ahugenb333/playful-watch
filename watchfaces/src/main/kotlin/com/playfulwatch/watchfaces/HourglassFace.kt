@@ -7,7 +7,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
@@ -16,7 +15,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playfulwatch.foundation.LocalPlayfulColors
-import com.playfulwatch.foundation.PlayfulTheme
 import org.splitties.compose.oclock.LocalIsAmbient
 import org.splitties.compose.oclock.LocalTime
 import org.splitties.compose.oclock.OClockCanvas
@@ -78,14 +76,14 @@ private fun topSandPath(geo: HourglassGeometry, fill: Float): Path {
     if (fill <= 0f) return Path()
     val clamped = fill.coerceIn(0f, 1f)
     val cx = geo.centerX
-    val surfaceY = geo.topY + (geo.neckY - geo.topY) * (1f - clamped)
+    val surfaceY = geo.neckY - (geo.neckY - geo.topY) * clamped
     val t = (surfaceY - geo.topY) / (geo.neckY - geo.topY)
     val halfWidth = lerp(geo.topHalfWidth, geo.neckHalfWidth, t)
     return Path().apply {
-        moveTo(cx - geo.topHalfWidth, geo.topY)
-        lineTo(cx + geo.topHalfWidth, geo.topY)
+        moveTo(cx - halfWidth, surfaceY)
         lineTo(cx + halfWidth, surfaceY)
-        lineTo(cx - halfWidth, surfaceY)
+        lineTo(cx + geo.neckHalfWidth, geo.neckY)
+        lineTo(cx - geo.neckHalfWidth, geo.neckY)
         close()
     }
 }
@@ -106,22 +104,6 @@ private fun bottomSandPath(geo: HourglassGeometry, fill: Float): Path {
     }
 }
 
-private fun flipRotation(minutes: Int, seconds: Int, millis: Int): Float {
-    val flipped = minutes % 2 == 1
-    val settled = if (flipped) 180f else 0f
-    val flipDurationMs = 600f
-    val msRemaining = (59 - seconds) * 1000 + (1000 - millis)
-    if (msRemaining > flipDurationMs) return settled
-
-    val flipProgress = 1f - msRemaining / flipDurationMs
-    val nextFlipped = (minutes + 1) % 2 == 1
-    return if (nextFlipped) {
-        lerp(0f, 180f, flipProgress)
-    } else {
-        lerp(180f, 0f, flipProgress)
-    }
-}
-
 @Composable
 fun HourglassFace() {
     val colors = LocalPlayfulColors.current
@@ -129,10 +111,8 @@ fun HourglassFace() {
     val isAmbient by LocalIsAmbient.current
 
     val minuteProgress = (time.seconds + time.millis / 1000f) / 60f
-    val isFlipped = time.minutes % 2 == 1
-    val topFill = if (isFlipped) minuteProgress else 1f - minuteProgress
-    val bottomFill = if (isFlipped) 1f - minuteProgress else minuteProgress
-    val rotation = flipRotation(time.minutes, time.seconds, time.millis)
+    val topFill = 1f - minuteProgress
+    val bottomFill = minuteProgress
 
     OClockCanvas {
         drawCircle(colors.background, radius = size.minDimension / 2f)
@@ -144,40 +124,34 @@ fun HourglassFace() {
         val sandColor = colors.tertiary.copy(alpha = if (isAmbient) 0.85f else 1f)
         val frameColor = colors.primary.copy(alpha = if (isAmbient) 0.9f else 1f)
 
-        rotate(rotation, pivot = center) {
-            drawPath(topChamberPath(geo), colors.background.copy(alpha = 0.35f))
-            drawPath(bottomChamberPath(geo), colors.background.copy(alpha = 0.35f))
+        drawPath(topChamberPath(geo), colors.background.copy(alpha = 0.35f))
+        drawPath(bottomChamberPath(geo), colors.background.copy(alpha = 0.35f))
 
-            drawPath(topSandPath(geo, topFill), sandColor)
-            drawPath(bottomSandPath(geo, bottomFill), sandColor)
+        drawPath(topSandPath(geo, topFill), sandColor)
+        drawPath(bottomSandPath(geo, bottomFill), sandColor)
 
-            drawPath(
-                hourglassFramePath(geo),
-                frameColor,
-                style = Stroke(width = frameStroke),
-            )
+        drawPath(
+            hourglassFramePath(geo),
+            frameColor,
+            style = Stroke(width = frameStroke),
+        )
 
-            drawCircle(
-                color = frameColor.copy(alpha = 0.6f),
-                radius = geo.neckHalfWidth,
-                center = Offset(geo.centerX, geo.neckY),
-            )
-        }
-    }
+        val neckMaskHalfHeight = 1.dp.toPx()
+        drawLine(
+            color = colors.background,
+            start = Offset(geo.centerX, geo.neckY - neckMaskHalfHeight),
+            end = Offset(geo.centerX, geo.neckY + neckMaskHalfHeight),
+            strokeWidth = geo.neckHalfWidth * 2f,
+        )
 
-    if (!isAmbient) {
-        OClockCanvas {
-            val geo = hourglassGeometry()
-            val speckRadius = 2.5.dp.toPx()
-            val fallProgress = (time.millis / 1000f).let { it * it }
-            val neckGap = 4.dp.toPx()
-            val speckY = lerp(geo.neckY - neckGap, geo.neckY + neckGap, fallProgress)
-
-            rotate(rotation, pivot = center) {
-                drawCircle(
-                    color = colors.tertiary,
-                    radius = speckRadius,
-                    center = Offset(geo.centerX, speckY),
+        if (topFill > 0f) {
+            val streamBottom = geo.bottomY - (geo.bottomY - geo.neckY) * bottomFill.coerceIn(0f, 1f)
+            if (streamBottom > geo.neckY) {
+                drawLine(
+                    color = sandColor,
+                    start = Offset(geo.centerX, geo.neckY - neckMaskHalfHeight),
+                    end = Offset(geo.centerX, streamBottom),
+                    strokeWidth = 3.5.dp.toPx(),
                 )
             }
         }
@@ -228,9 +202,4 @@ fun HourglassFace() {
             )
         }
     }
-}
-
-@Composable
-fun HourglassFacePreview() = PlayfulTheme(com.playfulwatch.foundation.PlayfulColorScheme.Hourglass) {
-    HourglassFace()
 }
