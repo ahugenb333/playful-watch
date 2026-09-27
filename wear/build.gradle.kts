@@ -32,6 +32,11 @@ android {
             applicationId = "com.playfulwatch.wear.liquidvials"
             resValue("string", "app_name", "Liquid Vials")
         }
+        create("vitalsTriad") {
+            dimension = "distribution"
+            applicationId = "com.playfulwatch.wear.vitalstriad"
+            resValue("string", "app_name", "Vitals Triad")
+        }
     }
 
     compileOptions {
