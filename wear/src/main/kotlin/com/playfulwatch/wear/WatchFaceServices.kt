@@ -76,9 +76,9 @@ class VitalsTriadWatchFaceService : ComposeWatchFaceService(
     }
 
     override fun complicationSlotBounds(slotId: Int): ComplicationSlotBounds = when (slotId) {
-        PlayfulComplicationSlots.WEATHER -> ComplicationSlotBounds(RectF(0.22f, 0.06f, 0.78f, 0.24f))
-        PlayfulComplicationSlots.STEPS -> ComplicationSlotBounds(RectF(0.08f, 0.72f, 0.46f, 0.90f))
-        PlayfulComplicationSlots.HEART_RATE -> ComplicationSlotBounds(RectF(0.54f, 0.72f, 0.92f, 0.90f))
+        PlayfulComplicationSlots.WEATHER -> ComplicationSlotBounds(RectF(0.10f, 0.24f, 0.90f, 0.46f))
+        PlayfulComplicationSlots.STEPS -> ComplicationSlotBounds(RectF(0.02f, 0.52f, 0.48f, 0.74f))
+        PlayfulComplicationSlots.HEART_RATE -> ComplicationSlotBounds(RectF(0.52f, 0.52f, 0.98f, 0.74f))
         else -> super.complicationSlotBounds(slotId)
     }
 
