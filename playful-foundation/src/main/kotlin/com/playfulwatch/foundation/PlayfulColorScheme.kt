@@ -44,6 +44,15 @@ data class PlayfulColorScheme(
             background = Color(0xFF03045E),
             onBackground = Color(0xFFCAF0F8),
         )
+
+        val VitalsTriad = Default.copy(
+            primary = Color(0xFF7B6CF6),
+            secondary = Color(0xFF5AD8A8),
+            tertiary = Color(0xFFFF8FAB),
+            accent = Color(0xFF64DFDF),
+            background = Color(0xFF12131A),
+            onBackground = Color(0xFFF0F2FF),
+        )
     }
 }
 

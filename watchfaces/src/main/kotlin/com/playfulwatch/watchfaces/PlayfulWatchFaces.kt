@@ -23,6 +23,12 @@ object PlayfulWatchFaces {
             defaultColors = com.playfulwatch.foundation.PlayfulColorScheme.LiquidVials,
             content = { LiquidVialsFace() },
         ),
+        PlayfulWatchFace(
+            id = "vitals_triad",
+            displayName = "Vitals Triad",
+            defaultColors = com.playfulwatch.foundation.PlayfulColorScheme.VitalsTriad,
+            content = { VitalsTriadFace() },
+        ),
     )
 
     fun byId(id: String): PlayfulWatchFace? = all.find { it.id == id }

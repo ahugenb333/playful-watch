@@ -35,4 +35,5 @@ dependencies {
     implementation(libs.compose.runtime)
     implementation(libs.compose.ui)
     implementation(libs.compose.foundation)
+    implementation("androidx.wear.watchface:watchface-complications-data:1.2.1")
 }
